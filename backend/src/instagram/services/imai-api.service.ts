@@ -21,7 +21,6 @@ export class ImaiApiService {
   private getHeaders(): Record<string, string> {
     return {
       'authkey': this.apiKey,
-      'x-api-key': this.apiKey,
     };
   }
 
