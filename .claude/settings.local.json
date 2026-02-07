@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir:*)",
+      "Bash(git -C \"C:\\\\Users\\\\ariel\\\\Documents\\\\github\\\\ig-assessment\" worktree list)",
+      "Bash(powershell -Command \"Get-ChildItem -Path ''C:\\\\Users\\\\ariel\\\\Documents\\\\github\\\\ig-assessment'' -Force | Select-Object FullName, PSIsContainer\")",
+      "Bash(powershell -Command:*)",
+      "Bash(git -C \"C:\\\\Users\\\\ariel\\\\Documents\\\\github\\\\ig-assessment\" status)",
+      "Bash(git -C \"C:\\\\Users\\\\ariel\\\\Documents\\\\github\\\\ig-assessment\" remote -v)",
+      "Bash(git -C \"C:\\\\Users\\\\ariel\\\\Documents\\\\github\\\\ig-assessment\" ls-remote origin)",
+      "Bash(git -C \"C:\\\\Users\\\\ariel\\\\Documents\\\\github\\\\ig-assessment\" fetch origin)",
+      "Bash(git -C \"C:\\\\Users\\\\ariel\\\\Documents\\\\github\\\\ig-assessment\" branch -r)",
+      "Bash(git -C \"C:\\\\Users\\\\ariel\\\\Documents\\\\github\\\\ig-assessment\" log --all --oneline)",
+      "Bash(git -C \"C:\\\\Users\\\\ariel\\\\Documents\\\\github\\\\ig-assessment\" show-ref)",
+      "Bash(git -C \"C:\\\\Users\\\\ariel\\\\Documents\\\\github\\\\ig-assessment\" log --all --oneline --graph)",
+      "Bash(git -C \"C:\\\\Users\\\\ariel\\\\Documents\\\\github\\\\ig-assessment\" rev-parse --all)",
+      "Bash(git -C \"C:\\\\Users\\\\ariel\\\\Documents\\\\github\\\\ig-assessment\" log claude/practical-hermann --oneline)",
+      "Bash(git -C \"C:\\\\Users\\\\ariel\\\\Documents\\\\github\\\\ig-assessment\" rev-list --all)",
+      "Bash(git -C \"C:\\\\Users\\\\ariel\\\\Documents\\\\github\\\\ig-assessment\" config --list)",
+      "WebFetch(domain:imai.co)",
+      "Bash(curl:*)",
+      "Bash(python:*)",
+      "Bash($temp = $env:TEMP)",
+      "Bash(node --version:*)",
+      "Bash(npm --version:*)",
+      "Bash(npx:*)"
+    ]
+  }
+}
