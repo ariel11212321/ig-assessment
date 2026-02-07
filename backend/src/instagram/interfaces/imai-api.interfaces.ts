@@ -49,32 +49,6 @@ export interface CarouselItem {
   videoUrl: string | null;
 }
 
-export interface ImaiStoryItem {
-  id: string;
-  mediaType: 'image' | 'video';
-  mediaUrl: string;
-  videoUrl: string | null;
-  timestamp: number;
-  expiringAt: number;
-}
-
-export interface ImaiHighlight {
-  id: string;
-  title: string;
-  coverUrl: string;
-  items: ImaiStoryItem[];
-}
-
-export interface ImaiComment {
-  id: string;
-  text: string;
-  createdAt: number;
-  likeCount: number;
-  username: string;
-  profilePicUrl: string;
-  replyCount: number;
-}
-
 export interface PaginatedResponse<T> {
   items: T[];
   nextCursor: string | null;

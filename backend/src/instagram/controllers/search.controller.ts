@@ -11,4 +11,10 @@ export class SearchController {
     const results = await this.instagramService.searchUsers(query.q);
     return { success: true, results };
   }
+
+  @Get('reels')
+  async searchReels(@Query() query: SearchQueryDto) {
+    const items = await this.instagramService.searchReels(query.q);
+    return { success: true, items };
+  }
 }
