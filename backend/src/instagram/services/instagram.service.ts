@@ -97,14 +97,53 @@ export class InstagramService {
   constructor(private readonly imaiApi: ImaiApiService) {}
 
   async searchUsers(query: string): Promise<ImaiSearchResult[]> {
-    const response = await this.imaiApi.get<{
-      success: boolean;
-      users?: RawSearchUser[];
-    }>('/raw/ig/search/users/', { q: query });
+    try {
+      // Try raw Instagram search endpoint
+      const response = await this.imaiApi.get<{
+        success: boolean;
+        users?: RawSearchUser[];
+      }>('/raw/ig/search/users/', { q: query });
 
-    if (!response.users) return [];
+      if (response.users && response.users.length > 0) {
+        return response.users.map((user) => this.mapSearchResult(user));
+      }
+    } catch (err) {
+      this.logger.warn(`Raw search failed, falling back to newv1 search: ${err}`);
+    }
 
-    return response.users.map((user) => this.mapSearchResult(user));
+    // Fallback: use the IMAI search API
+    try {
+      const response = await this.imaiApi.post<{
+        success: boolean;
+        data?: {
+          results?: Array<{
+            user_id?: string;
+            username?: string;
+            fullname?: string;
+            picture?: string;
+            is_verified?: boolean;
+            followers?: number;
+          }>;
+        };
+      }>('/search/newv1/', {
+        platform: 'instagram',
+        search_term: query,
+        limit: 10,
+      });
+
+      const results = response.data?.results || [];
+      return results.map((user): ImaiSearchResult => ({
+        userId: user.user_id || '',
+        username: user.username || '',
+        fullName: user.fullname || '',
+        profilePicUrl: user.picture || '',
+        isVerified: user.is_verified || false,
+        followerCount: user.followers || 0,
+      }));
+    } catch (err) {
+      this.logger.error(`Search newv1 also failed: ${err}`);
+      return [];
+    }
   }
 
   async getProfileInfo(username: string): Promise<ImaiProfileInfo> {

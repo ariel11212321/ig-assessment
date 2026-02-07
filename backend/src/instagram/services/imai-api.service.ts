@@ -21,6 +21,7 @@ export class ImaiApiService {
   private getHeaders(): Record<string, string> {
     return {
       'authkey': this.apiKey,
+      'x-api-key': this.apiKey,
     };
   }
 
@@ -39,6 +40,8 @@ export class ImaiApiService {
       headers: this.getHeaders(),
       params: filteredParams,
     };
+
+    this.logger.debug(`GET ${url} params=${JSON.stringify(filteredParams)}`);
 
     try {
       const response: AxiosResponse<T> = await firstValueFrom(
@@ -74,7 +77,7 @@ export class ImaiApiService {
         axiosError.response?.data?.error ||
         'An error occurred with the IMAI API';
 
-      this.logger.error(`IMAI API Error [${endpoint}]: ${status} - ${message}`);
+      this.logger.error(`IMAI API Error [${endpoint}]: ${status} - ${message}`, JSON.stringify(axiosError.response?.data));
       throw new HttpException(
         { error: message, statusCode: status },
         status,
