@@ -1,0 +1,47 @@
+:host {
+  display: block;
+  max-width: 935px;
+  margin: 0 auto;
+  padding: 30px 20px 0;
+}
+
+.profile-skeleton {
+  .profile-skeleton-header {
+    display: flex;
+    align-items: center;
+    gap: 80px;
+    padding: 20px 0 40px;
+
+    .profile-skeleton-info {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+  }
+
+  .profile-skeleton-highlights {
+    display: flex;
+    gap: 16px;
+    padding: 10px 0 20px;
+
+    .highlight-skeleton {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+  }
+}
+
+@media (max-width: 735px) {
+  :host {
+    padding: 0;
+  }
+
+  .profile-skeleton {
+    .profile-skeleton-header {
+      gap: 20px;
+      padding: 16px;
+    }
+  }
+}

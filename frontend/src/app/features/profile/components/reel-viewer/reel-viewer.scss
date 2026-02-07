@@ -1,0 +1,163 @@
+.reel-viewer-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.9);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.close-btn {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  z-index: 1001;
+  opacity: 0.8;
+
+  &:hover { opacity: 1; }
+}
+
+.reel-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 90vh;
+  max-width: 400px;
+  width: 100%;
+  position: relative;
+}
+
+.reel-nav {
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: absolute;
+  z-index: 5;
+
+  &:hover { background: rgba(255, 255, 255, 0.25); }
+
+  &.reel-nav-up { top: 0; }
+  &.reel-nav-down { bottom: 0; }
+}
+
+.reel-content {
+  position: relative;
+  flex: 1;
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #000;
+}
+
+.reel-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  cursor: pointer;
+}
+
+.play-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.reel-info {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  right: 64px;
+  z-index: 2;
+}
+
+.reel-username {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.reel-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid white;
+  object-fit: cover;
+}
+
+.reel-caption {
+  color: white;
+  font-size: 14px;
+  line-height: 1.4;
+  max-height: 42px;
+  overflow: hidden;
+
+  &.expanded {
+    max-height: none;
+  }
+
+  :host ::ng-deep .caption-link {
+    color: white;
+    font-weight: 600;
+  }
+}
+
+.more-btn {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 0;
+  font-family: inherit;
+}
+
+.reel-actions {
+  position: absolute;
+  bottom: 80px;
+  right: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  z-index: 2;
+}
+
+.reel-action {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+@media (max-width: 735px) {
+  .reel-container {
+    max-width: 100%;
+    height: 100vh;
+  }
+
+  .reel-content {
+    border-radius: 0;
+  }
+}
