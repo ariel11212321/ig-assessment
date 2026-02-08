@@ -70,6 +70,8 @@ interface RawMediaNode {
   thumbnail_url?: string;
   display_url?: string;
   expiring_at?: number;
+  reshare_count?: number;
+  repost_count?: number;
 }
 
 interface RawReelItem {
@@ -216,6 +218,24 @@ export class InstagramService {
     };
   }
 
+  async getUserFeedMore(username: string, cursor?: string): Promise<PaginatedResponse<ImaiMediaItem>> {
+    const params: Record<string, string> = { url: username };
+    if (cursor) params['after'] = cursor;
+
+    const response = await this.imaiApi.get<{
+      status?: string;
+      items?: RawMediaNode[];
+      end_cursor?: string;
+      more_available?: boolean;
+    }>('/raw/ig/user/feed_more/', params);
+
+    return {
+      items: (response.items || []).map((item) => this.mapMediaItem(item)),
+      nextCursor: response.end_cursor || null,
+      hasMore: response.more_available || false,
+    };
+  }
+
   async getUserReels(username: string, cursor?: string): Promise<PaginatedResponse<ImaiMediaItem>> {
     const params: Record<string, string> = { url: username };
     if (cursor) params['after'] = cursor;
@@ -226,6 +246,29 @@ export class InstagramService {
       end_cursor?: string;
       more_available?: boolean;
     }>('/raw/ig/user/reels/', params);
+
+    const items = (response.items || [])
+      .map((item) => item.media)
+      .filter((media): media is RawMediaNode => !!media)
+      .map((media) => this.mapMediaItem(media));
+
+    return {
+      items,
+      nextCursor: response.end_cursor || null,
+      hasMore: response.more_available || false,
+    };
+  }
+
+  async getUserReelsMore(username: string, cursor?: string): Promise<PaginatedResponse<ImaiMediaItem>> {
+    const params: Record<string, string> = { url: username };
+    if (cursor) params['after'] = cursor;
+
+    const response = await this.imaiApi.get<{
+      status?: string;
+      items?: RawReelItem[];
+      end_cursor?: string;
+      more_available?: boolean;
+    }>('/raw/ig/user/reels_more/', params);
 
     const items = (response.items || [])
       .map((item) => item.media)
@@ -316,6 +359,24 @@ export class InstagramService {
     };
   }
 
+  async getUserIgtv(username: string, cursor?: string): Promise<PaginatedResponse<ImaiMediaItem>> {
+    const params: Record<string, string> = { url: username };
+    if (cursor) params['after'] = cursor;
+
+    const response = await this.imaiApi.get<{
+      status?: string;
+      items?: RawMediaNode[];
+      end_cursor?: string;
+      more_available?: boolean;
+    }>('/raw/ig/user/igtv/', params);
+
+    return {
+      items: (response.items || []).map((item) => this.mapMediaItem(item)),
+      nextCursor: response.end_cursor || null,
+      hasMore: response.more_available || false,
+    };
+  }
+
   async getMediaDetail(mediaId: string): Promise<MediaDetail> {
     const response = await this.imaiApi.get<{
       status?: string;
@@ -339,9 +400,31 @@ export class InstagramService {
     };
   }
 
+  async getMediaDetailMore(mediaId: string): Promise<MediaDetail> {
+    const response = await this.imaiApi.get<{
+      status?: string;
+      items?: RawMediaNode[];
+    }>('/raw/ig/media/info_more/', { url: mediaId });
+
+    const item = response.items?.[0];
+    if (!item) {
+      throw new Error('Media not found');
+    }
+
+    const base = this.mapMediaItem(item);
+    return {
+      ...base,
+      owner: {
+        username: item.user?.username || '',
+        profilePicUrl: item.user?.profile_pic_url || '',
+        isVerified: item.user?.is_verified || false,
+        fullName: item.user?.full_name || '',
+      },
+    };
+  }
+
   async getMediaComments(mediaId: string, cursor?: string): Promise<PaginatedResponse<CommentItem>> {
-    const mediaCode = this.extractMediaCode(mediaId);
-    const params: Record<string, string> = { url: mediaId, code: mediaCode };
+    const params: Record<string, string> = { url: mediaId };
     if (cursor) params['after'] = cursor;
 
     const response = await this.imaiApi.get<{
@@ -391,6 +474,39 @@ export class InstagramService {
       items: (response.items || []).map((item) => this.mapMediaItem(item)),
       nextCursor: response.next_cursor || null,
       hasMore: response.has_more || false,
+    };
+  }
+
+  async getHashtagInfo(hashtag: string): Promise<{ id: string; name: string; mediaCount: number }> {
+    const response = await this.imaiApi.get<{
+      status?: string;
+      id?: string;
+      name?: string;
+      media_count?: number;
+    }>('/raw/ig/hashtag/info/', { url: hashtag });
+
+    return {
+      id: response.id || '',
+      name: response.name || hashtag,
+      mediaCount: response.media_count || 0,
+    };
+  }
+
+  async getAudioFeed(audioId: string, cursor?: string): Promise<PaginatedResponse<ImaiMediaItem>> {
+    const params: Record<string, string> = { url: audioId };
+    if (cursor) params['after'] = cursor;
+
+    const response = await this.imaiApi.get<{
+      status?: string;
+      items?: RawMediaNode[];
+      end_cursor?: string;
+      more_available?: boolean;
+    }>('/raw/ig/audio/feed/', params);
+
+    return {
+      items: (response.items || []).map((item) => this.mapMediaItem(item)),
+      nextCursor: response.end_cursor || null,
+      hasMore: response.more_available || false,
     };
   }
 

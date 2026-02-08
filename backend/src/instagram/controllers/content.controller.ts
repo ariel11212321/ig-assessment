@@ -21,6 +21,12 @@ class CommentIdParamsDto {
   commentId!: string;
 }
 
+class UsernameParamsDto {
+  @IsString()
+  @MinLength(1)
+  username!: string;
+}
+
 @Controller('instagram')
 export class ContentController {
   constructor(private readonly instagramService: InstagramService) {}
@@ -47,5 +53,11 @@ export class ContentController {
   async getHighlightDetail(@Param() params: HighlightIdParamsDto) {
     const highlight = await this.instagramService.getHighlightDetail(params.highlightId);
     return { success: true, highlight };
+  }
+
+  @Get(':username/igtv')
+  async getUserIgtv(@Param() params: UsernameParamsDto, @Query() query: FeedQueryDto) {
+    const result = await this.instagramService.getUserIgtv(params.username, query.cursor);
+    return { success: true, ...result };
   }
 }
