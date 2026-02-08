@@ -20,8 +20,6 @@ const IMAI_ERROR_STATUS_MAP: Record<string, number> = {
   empty_audience_data: HttpStatus.BAD_REQUEST,
   retry_later: HttpStatus.BAD_REQUEST,
   bad_filter: HttpStatus.BAD_REQUEST,
-  comment_unavailable: HttpStatus.BAD_REQUEST,
-  media_not_found: HttpStatus.BAD_REQUEST,
   entity_not_found: HttpStatus.BAD_REQUEST,
   entity_is_hidden: HttpStatus.BAD_REQUEST,
   no_tokens_remaining: HttpStatus.BAD_REQUEST,
@@ -60,7 +58,7 @@ export class ImaiApiService {
     };
   }
 
-  async get<T extends { success?: boolean }>(endpoint: string, params?: Record<string, string | number | boolean | undefined>): Promise<T> {
+  async get<T extends Record<string, unknown>>(endpoint: string, params?: Record<string, string | number | boolean | undefined>): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`;
     const filteredParams: Record<string, string | number | boolean> = {};
     if (params) {
@@ -89,7 +87,7 @@ export class ImaiApiService {
     }
   }
 
-  async post<T extends { success?: boolean }>(endpoint: string, body?: Record<string, unknown>): Promise<T> {
+  async post<T extends Record<string, unknown>>(endpoint: string, body?: Record<string, unknown>): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`;
     const config: AxiosRequestConfig = {
       headers: this.getHeaders(),
@@ -106,7 +104,7 @@ export class ImaiApiService {
     }
   }
 
-  private validateResponse<T extends { success?: boolean }>(data: T, endpoint: string): void {
+  private validateResponse<T extends Record<string, unknown>>(data: T, endpoint: string): void {
     if (data && typeof data === 'object' && 'success' in data && data.success === false) {
       const errorData = data as unknown as ImaiErrorResponse;
       const errorCode = errorData.error || 'unknown_error';
