@@ -9,8 +9,10 @@ import {
   OnDestroy,
   ViewChild,
   ElementRef,
+  inject,
 } from '@angular/core';
 import { MediaItem } from '../../../../core/models/instagram.models';
+import { ApiService } from '../../../../core/services/api.service';
 import { ShortNumberPipe } from '../../../../shared/pipes/short-number.pipe';
 import { CaptionPipe } from '../../../../shared/pipes/caption.pipe';
 
@@ -56,7 +58,7 @@ import { CaptionPipe } from '../../../../shared/pipes/caption.pipe';
 
             <div class="reel-info">
               <div class="reel-username">
-                <img [src]="reel.owner.profilePicUrl" class="reel-avatar" [alt]="reel.owner.username" />
+                <img [src]="api.getMediaProxyUrl(reel.owner.profilePicUrl)" class="reel-avatar" [alt]="reel.owner.username" />
                 <span>{{ reel.owner.username }}</span>
               </div>
               @if (reel.caption) {
@@ -117,6 +119,7 @@ import { CaptionPipe } from '../../../../shared/pipes/caption.pipe';
   styleUrl: './reel-viewer.scss',
 })
 export class ReelViewerComponent implements OnInit, OnDestroy {
+  readonly api = inject(ApiService);
   @Input({ required: true }) reels: MediaItem[] = [];
   @Input({ required: true }) currentIndex = 0;
   @Output() close = new EventEmitter<void>();
