@@ -48,7 +48,6 @@ export class ProfileController {
     const items = await this.instagramService.getUserStories(params.username);
     return { success: true, items };
   }
-
   @Get(':username/highlights')
   async getUserHighlights(@Param() params: ProfileParamsDto) {
     const items = await this.instagramService.getUserHighlights(params.username);

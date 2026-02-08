@@ -306,7 +306,7 @@ export class InstagramService {
       id?: string;
       cover_media?: { cropped_image_version?: { url?: string } };
       items?: RawMediaNode[];
-    }>('/raw/ig/highlight/info/', { highlight_id: normalizedHighlightId });
+    }>('/raw/ig/highlight/info/', { url: normalizedHighlightId });
 
     return {
       id: response.id || normalizedHighlightId,
