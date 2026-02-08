@@ -8,7 +8,6 @@ export const routes: Routes = [
   },
   {
     path: 'home',
-    loadComponent: () => import('./features/search/search').then((m) => m.SearchComponent),
   },
   {
     path: 'profile/:username',
