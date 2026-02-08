@@ -15,6 +15,10 @@ export const routes: Routes = [
     loadComponent: () => import('./features/profile/profile').then((m) => m.ProfileComponent),
   },
   {
+    path: 'hashtag/:tag',
+    loadComponent: () => import('./features/hashtag/hashtag').then((m) => m.HashtagComponent),
+  },
+  {
     path: '**',
     redirectTo: 'home',
   },

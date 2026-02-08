@@ -1,0 +1,80 @@
+.highlights-bar {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border-color, #dbdbdb);
+}
+
+.highlights-scroll {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding: 0 16px;
+
+  // Hide scrollbar across browsers
+  scrollbar-width: none; // Firefox
+  -ms-overflow-style: none; // IE/Edge
+
+  &::-webkit-scrollbar {
+    display: none; // Chrome, Safari, Opera
+  }
+}
+
+.highlight-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+
+  &:focus-visible {
+    outline: 2px solid var(--link-color, #00376b);
+    outline-offset: 4px;
+    border-radius: 4px;
+  }
+}
+
+.highlight-circle {
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
+  border: 1px solid var(--border-color, #dbdbdb);
+  padding: 3px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-primary, #fff);
+
+  @media (max-width: 735px) {
+    width: 56px;
+    height: 56px;
+  }
+
+  &.skeleton-circle {
+    padding: 0;
+    border: none;
+    overflow: hidden;
+  }
+}
+
+.highlight-cover {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.highlight-title {
+  max-width: 70px;
+  font-size: 12px;
+  line-height: 1.2;
+  color: var(--text-primary, #262626);
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
