@@ -66,7 +66,7 @@ interface CommentsResponse extends ApiResponse {
 @Injectable({ providedIn: 'root' })
 export class ApiService {
   private readonly http = inject(HttpClient);
-  private readonly baseUrl = 'http://localhost:3000/api';
+  private readonly baseUrl = 'https://ig-assessment-server.onrender.com/api';
 
   searchUsers(query: string): Observable<SearchResult[]> {
     return this.http
