@@ -73,7 +73,7 @@ export class InstagramService {
       const response = await this.imaiApi.get<{
         success: boolean;
         users?: RawSearchUser[];
-      }>('/raw/ig/search/users/', { q: query });
+      }>('/raw/ig/search/users/', { keyword: query });
 
       if (response.users && response.users.length > 0) {
         return response.users.map((user) => this.mapSearchResult(user));
@@ -97,9 +97,7 @@ export class InstagramService {
           }>;
         };
       }>('/search/newv1/', {
-        platform: 'instagram',
-        search_term: query,
-        limit: 10,
+        keyword: query,
       });
 
       const results = response.data?.results || [];
