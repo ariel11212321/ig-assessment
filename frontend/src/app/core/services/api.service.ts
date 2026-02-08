@@ -172,7 +172,8 @@ export class ApiService {
       .pipe(map((res) => ({ items: res.items, nextCursor: res.nextCursor, hasMore: res.hasMore })));
   }
 
-  getMediaProxyUrl(url: string): string {
-    return `${this.baseUrl}/instagram/media/proxy?url=${encodeURIComponent(url)}`;
-  }
+ getMediaProxyUrl(url: string): string {
+    const cleanUrl = url.replace(/&amp;/g, '&');
+    return `${this.baseUrl}/instagram/media/proxy?url=${encodeURIComponent(cleanUrl)}`;
+}
 }
