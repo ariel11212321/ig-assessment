@@ -1,6 +1,6 @@
 import { Component, inject, signal, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Subject, takeUntil, switchMap } from 'rxjs';
+import { Subject, takeUntil, switchMap, EMPTY } from 'rxjs';
 import { ApiService } from '../../core/services/api.service';
 import {
   ProfileInfo,
@@ -55,6 +55,10 @@ export class ProfileComponent implements OnInit, OnDestroy {
     this.route.paramMap.pipe(
       switchMap((params) => {
         const username = params.get('username') || '';
+        if (!username) {
+          this.loading.set(false);
+          return EMPTY;
+        }
         this.resetState();
         this.loading.set(true);
         return this.api.getProfile(username);
