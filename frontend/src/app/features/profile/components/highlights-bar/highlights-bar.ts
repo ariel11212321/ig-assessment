@@ -1,5 +1,6 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
 import { HighlightInfo } from '../../../../core/models/instagram.models';
+import { ApiService } from '../../../../core/services/api.service';
 import { SkeletonComponent } from '../../../../shared/components/skeleton/skeleton';
 
 @Component({
@@ -33,7 +34,7 @@ import { SkeletonComponent } from '../../../../shared/components/skeleton/skelet
             >
               <div class="highlight-circle">
                 <img
-                  [src]="highlight.coverUrl"
+                  [src]="api.getMediaProxyUrl(highlight.coverUrl)"
                   [alt]="highlight.title"
                   class="highlight-cover"
                   loading="lazy"
@@ -49,6 +50,7 @@ import { SkeletonComponent } from '../../../../shared/components/skeleton/skelet
   styleUrl: './highlights-bar.scss',
 })
 export class HighlightsBarComponent {
+  readonly api = inject(ApiService);
   @Input() highlights: HighlightInfo[] = [];
   @Input() loading = false;
   @Output() highlightClick = new EventEmitter<HighlightInfo>();
