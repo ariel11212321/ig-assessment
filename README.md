@@ -1,5 +1,4 @@
-PLEASE READ DOCS AT imai_api_documentation
-
+PLEASE READ DOCS AT DOCS.md
 # Instagram Profile Viewer
 
 A full-stack Instagram Profile Viewer that replicates the look and feel of an Instagram profile page using real data from the IMAI API. Built with **NestJS** (backend) and **Angular 19** (frontend).
