@@ -11,8 +11,10 @@ import {
   ViewChild,
   ElementRef,
   NgZone,
+  inject,
 } from '@angular/core';
 import { StoryItem } from '../../../../core/models/instagram.models';
+import { ApiService } from '../../../../core/services/api.service';
 import { TimeAgoPipe } from '../../../../shared/pipes/time-ago.pipe';
 
 const IMAGE_DURATION_MS = 5000;
@@ -49,7 +51,7 @@ const PROGRESS_INTERVAL_MS = 50;
         <div class="story-user-info">
           @if (profilePicUrl) {
             <img
-              [src]="profilePicUrl"
+              [src]="api.getMediaProxyUrl(profilePicUrl)"
               class="story-avatar"
               [alt]="title"
             />
@@ -120,6 +122,7 @@ const PROGRESS_INTERVAL_MS = 50;
   styleUrl: './story-viewer.scss',
 })
 export class StoryViewerComponent implements OnInit, OnDestroy {
+  readonly api = inject(ApiService);
   @Input({ required: true }) items: StoryItem[] = [];
   @Input() title: string = '';
   @Input() profilePicUrl: string = '';
