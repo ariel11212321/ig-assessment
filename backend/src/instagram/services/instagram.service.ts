@@ -4,9 +4,6 @@ import {
   ImaiSearchResult,
   ImaiProfileInfo,
   ImaiMediaItem,
-  ImaiStoryItem,
-  ImaiHighlight,
-  ImaiComment,
   PaginatedResponse,
   ContactInfo,
   CarouselItem,
@@ -64,32 +61,6 @@ interface RawMediaNode {
   display_url?: string;
 }
 
-interface RawStoryItem {
-  pk?: string;
-  id?: string;
-  media_type?: number;
-  image_versions2?: { candidates?: Array<{ url?: string; width?: number; height?: number }> };
-  video_versions?: Array<{ url?: string; width?: number; height?: number }>;
-  taken_at?: number;
-  expiring_at?: number;
-}
-
-interface RawHighlight {
-  id?: string;
-  title?: string;
-  cover_media?: { cropped_image_version?: { url?: string } };
-  items?: RawStoryItem[];
-}
-
-interface RawComment {
-  pk?: string;
-  text?: string;
-  created_at?: number;
-  comment_like_count?: number;
-  user?: { username?: string; profile_pic_url?: string };
-  child_comment_count?: number;
-}
-
 @Injectable()
 export class InstagramService {
   private readonly logger = new Logger(InstagramService.name);
@@ -98,7 +69,7 @@ export class InstagramService {
 
   async searchUsers(query: string): Promise<ImaiSearchResult[]> {
     try {
-      // Try raw Instagram search endpoint
+      // Documented: GET /raw/ig/search/users/
       const response = await this.imaiApi.get<{
         success: boolean;
         users?: RawSearchUser[];
@@ -111,7 +82,7 @@ export class InstagramService {
       this.logger.warn(`Raw search failed, falling back to newv1 search: ${err}`);
     }
 
-    // Fallback: use the IMAI search API
+    // Fallback: Documented: POST /search/newv1/
     try {
       const response = await this.imaiApi.post<{
         success: boolean;
@@ -146,7 +117,18 @@ export class InstagramService {
     }
   }
 
+  async searchReels(query: string): Promise<ImaiMediaItem[]> {
+    // Documented: GET /raw/ig/search/reels/
+    const response = await this.imaiApi.get<{
+      success: boolean;
+      items?: RawMediaNode[];
+    }>('/raw/ig/search/reels/', { q: query });
+
+    return (response.items || []).map((item) => this.mapMediaItem(item));
+  }
+
   async getProfileInfo(username: string): Promise<ImaiProfileInfo> {
+    // Documented: GET /raw/ig/user/info/
     const response = await this.imaiApi.get<{
       success: boolean;
       user_info?: RawUserInfo;
@@ -160,143 +142,8 @@ export class InstagramService {
     return this.mapProfileInfo(user);
   }
 
-  async getUserFeed(username: string, cursor?: string): Promise<PaginatedResponse<ImaiMediaItem>> {
-    const params: Record<string, string> = { username };
-    if (cursor) params['after'] = cursor;
-
-    const response = await this.imaiApi.get<{
-      success: boolean;
-      items?: RawMediaNode[];
-      next_cursor?: string;
-      has_more?: boolean;
-    }>('/raw/ig/user/feed/', params);
-
-    return {
-      items: (response.items || []).map((item) => this.mapMediaItem(item)),
-      nextCursor: response.next_cursor || null,
-      hasMore: response.has_more || false,
-    };
-  }
-
-  async getUserReels(username: string, cursor?: string): Promise<PaginatedResponse<ImaiMediaItem>> {
-    const params: Record<string, string> = { username };
-    if (cursor) params['after'] = cursor;
-
-    const response = await this.imaiApi.get<{
-      success: boolean;
-      items?: RawMediaNode[];
-      next_cursor?: string;
-      has_more?: boolean;
-    }>('/raw/ig/user/reels/', params);
-
-    return {
-      items: (response.items || []).map((item) => this.mapMediaItem(item)),
-      nextCursor: response.next_cursor || null,
-      hasMore: response.has_more || false,
-    };
-  }
-
-  async getUserTagged(username: string, cursor?: string): Promise<PaginatedResponse<ImaiMediaItem>> {
-    const params: Record<string, string> = { username };
-    if (cursor) params['after'] = cursor;
-
-    const response = await this.imaiApi.get<{
-      success: boolean;
-      items?: RawMediaNode[];
-      next_cursor?: string;
-      has_more?: boolean;
-    }>('/raw/ig/user/tagged/', params);
-
-    return {
-      items: (response.items || []).map((item) => this.mapMediaItem(item)),
-      nextCursor: response.next_cursor || null,
-      hasMore: response.has_more || false,
-    };
-  }
-
-  async getUserStories(username: string): Promise<ImaiStoryItem[]> {
-    const response = await this.imaiApi.get<{
-      success: boolean;
-      stories?: RawStoryItem[];
-    }>('/raw/ig/user/stories/', { username });
-
-    return (response.stories || []).map((item) => this.mapStoryItem(item));
-  }
-
-  async getUserHighlights(username: string): Promise<ImaiHighlight[]> {
-    const response = await this.imaiApi.get<{
-      success: boolean;
-      highlights?: RawHighlight[];
-    }>('/raw/ig/user/highlights/', { username });
-
-    return (response.highlights || []).map((hl) => this.mapHighlight(hl));
-  }
-
-  async getHighlightDetail(highlightId: string): Promise<ImaiHighlight> {
-    const response = await this.imaiApi.get<{
-      success: boolean;
-      highlight?: RawHighlight;
-    }>('/raw/ig/highlight/', { highlight_id: highlightId });
-
-    const hl = response.highlight;
-    if (!hl) {
-      throw new Error('Highlight not found');
-    }
-
-    return this.mapHighlight(hl);
-  }
-
-  async getPostDetail(postId: string): Promise<ImaiMediaItem> {
-    const response = await this.imaiApi.get<{
-      success: boolean;
-      media?: RawMediaNode;
-    }>('/raw/ig/media/info/', { shortcode: postId });
-
-    const media = response.media;
-    if (!media) {
-      throw new Error('Post not found');
-    }
-
-    return this.mapMediaItem(media);
-  }
-
-  async getPostComments(postId: string, cursor?: string): Promise<PaginatedResponse<ImaiComment>> {
-    const params: Record<string, string> = { shortcode: postId };
-    if (cursor) params['after'] = cursor;
-
-    const response = await this.imaiApi.get<{
-      success: boolean;
-      comments?: RawComment[];
-      next_cursor?: string;
-      has_more?: boolean;
-    }>('/raw/ig/media/comments/', params);
-
-    return {
-      items: (response.comments || []).map((c) => this.mapComment(c)),
-      nextCursor: response.next_cursor || null,
-      hasMore: response.has_more || false,
-    };
-  }
-
-  async getCommentReplies(postId: string, commentId: string, cursor?: string): Promise<PaginatedResponse<ImaiComment>> {
-    const params: Record<string, string> = { shortcode: postId, comment_id: commentId };
-    if (cursor) params['after'] = cursor;
-
-    const response = await this.imaiApi.get<{
-      success: boolean;
-      comments?: RawComment[];
-      next_cursor?: string;
-      has_more?: boolean;
-    }>('/raw/ig/media/comments/replies/', params);
-
-    return {
-      items: (response.comments || []).map((c) => this.mapComment(c)),
-      nextCursor: response.next_cursor || null,
-      hasMore: response.has_more || false,
-    };
-  }
-
   async getContactInfo(username: string): Promise<ContactInfo> {
+    // Documented: GET /exports/contacts/
     const response = await this.imaiApi.get<{
       success: boolean;
       contacts?: {
@@ -319,6 +166,7 @@ export class InstagramService {
   }
 
   async getHashtagFeed(hashtag: string, cursor?: string): Promise<PaginatedResponse<ImaiMediaItem>> {
+    // Documented: GET /raw/ig/hashtag/feed/
     const params: Record<string, string> = { tag: hashtag };
     if (cursor) params['after'] = cursor;
 
@@ -395,38 +243,6 @@ export class InstagramService {
     };
   }
 
-  private mapStoryItem(item: RawStoryItem): ImaiStoryItem {
-    return {
-      id: item.pk || item.id || '',
-      mediaType: item.media_type === 2 ? 'video' : 'image',
-      mediaUrl: this.getBestImageFromStory(item),
-      videoUrl: item.media_type === 2 ? this.getVideoUrlFromStory(item) : null,
-      timestamp: item.taken_at || 0,
-      expiringAt: item.expiring_at || 0,
-    };
-  }
-
-  private mapHighlight(hl: RawHighlight): ImaiHighlight {
-    return {
-      id: hl.id || '',
-      title: hl.title || '',
-      coverUrl: hl.cover_media?.cropped_image_version?.url || '',
-      items: (hl.items || []).map((item) => this.mapStoryItem(item)),
-    };
-  }
-
-  private mapComment(c: RawComment): ImaiComment {
-    return {
-      id: c.pk || '',
-      text: c.text || '',
-      createdAt: c.created_at || 0,
-      likeCount: c.comment_like_count || 0,
-      username: c.user?.username || '',
-      profilePicUrl: c.user?.profile_pic_url || '',
-      replyCount: c.child_comment_count || 0,
-    };
-  }
-
   private getMediaType(node: RawMediaNode): 'image' | 'video' | 'carousel' {
     if (node.carousel_media && node.carousel_media.length > 0) return 'carousel';
     if (node.media_type === 2 || node.video_versions?.length) return 'video';
@@ -444,25 +260,9 @@ export class InstagramService {
     return '';
   }
 
-  private getBestImageFromStory(item: RawStoryItem): string {
-    const candidates = item.image_versions2?.candidates;
-    if (candidates && candidates.length > 0) {
-      const sorted = [...candidates].sort((a, b) => (b.width || 0) - (a.width || 0));
-      return sorted[0].url || '';
-    }
-    return '';
-  }
-
   private getVideoUrl(node: RawMediaNode): string | null {
     if (node.video_versions && node.video_versions.length > 0) {
       return node.video_versions[0].url || null;
-    }
-    return null;
-  }
-
-  private getVideoUrlFromStory(item: RawStoryItem): string | null {
-    if (item.video_versions && item.video_versions.length > 0) {
-      return item.video_versions[0].url || null;
     }
     return null;
   }

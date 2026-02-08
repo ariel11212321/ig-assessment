@@ -15,10 +15,6 @@ export const routes: Routes = [
     loadComponent: () => import('./features/profile/profile').then((m) => m.ProfileComponent),
   },
   {
-    path: 'profile/:username/post/:postId',
-    loadComponent: () => import('./features/profile/profile').then((m) => m.ProfileComponent),
-  },
-  {
     path: '**',
     redirectTo: 'home',
   },
