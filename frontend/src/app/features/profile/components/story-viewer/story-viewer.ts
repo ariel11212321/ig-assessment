@@ -92,7 +92,7 @@ const PROGRESS_INTERVAL_MS = 50;
         @if (currentItem(); as item) {
           @if (item.mediaType === 'image') {
             <img
-              [src]="item.mediaUrl"
+              [src]="api.getMediaProxyUrl(item.mediaUrl)"
               class="story-media story-image"
               [alt]="'Story by ' + title"
               (load)="onImageLoaded()"
@@ -100,7 +100,7 @@ const PROGRESS_INTERVAL_MS = 50;
           } @else {
             <video
               #videoPlayer
-              [src]="item.videoUrl || item.mediaUrl"
+              [src]="api.getMediaProxyUrl(item.videoUrl || item.mediaUrl)"
               class="story-media story-video"
               [muted]="muted()"
               autoplay
