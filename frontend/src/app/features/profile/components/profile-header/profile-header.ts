@@ -1,5 +1,6 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
 import { ProfileInfo } from '../../../../core/models/instagram.models';
+import { ApiService } from '../../../../core/services/api.service';
 import { VerifiedBadgeComponent } from '../../../../shared/components/verified-badge/verified-badge';
 import { ShortNumberPipe } from '../../../../shared/pipes/short-number.pipe';
 
@@ -12,7 +13,7 @@ import { ShortNumberPipe } from '../../../../shared/pipes/short-number.pipe';
       <div class="profile-pic-container" (click)="onProfilePicClick()" [class.has-stories]="hasStories">
         <div class="profile-pic-border">
           <img
-            [src]="profile.profilePicUrlHd || profile.profilePicUrl"
+            [src]="api.getMediaProxyUrl(profile.profilePicUrlHd || profile.profilePicUrl)"
             [alt]="profile.username"
             class="profile-pic"
             loading="lazy"
@@ -67,7 +68,7 @@ import { ShortNumberPipe } from '../../../../shared/pipes/short-number.pipe';
         <div class="profile-pic-container" (click)="onProfilePicClick()" [class.has-stories]="hasStories">
           <div class="profile-pic-border">
             <img
-              [src]="profile.profilePicUrlHd || profile.profilePicUrl"
+              [src]="api.getMediaProxyUrl(profile.profilePicUrlHd || profile.profilePicUrl)"
               [alt]="profile.username"
               class="profile-pic"
               loading="lazy"
@@ -116,6 +117,7 @@ import { ShortNumberPipe } from '../../../../shared/pipes/short-number.pipe';
   styleUrl: './profile-header.scss',
 })
 export class ProfileHeaderComponent {
+  readonly api = inject(ApiService);
   @Input({ required: true }) profile!: ProfileInfo;
   @Input() hasStories = false;
   @Output() profilePicClick = new EventEmitter<void>();
