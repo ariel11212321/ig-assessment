@@ -299,16 +299,17 @@ export class InstagramService {
   }
 
   async getHighlightDetail(highlightId: string): Promise<HighlightDetail> {
+    const normalizedHighlightId = this.normalizeHighlightId(highlightId);
     const response = await this.imaiApi.get<{
       status?: string;
       title?: string;
       id?: string;
       cover_media?: { cropped_image_version?: { url?: string } };
       items?: RawMediaNode[];
-    }>('/raw/ig/highlight/info/', { url: highlightId });
+    }>('/raw/ig/highlight/info/', { highlight_id: normalizedHighlightId });
 
     return {
-      id: response.id || highlightId,
+      id: response.id || normalizedHighlightId,
       title: response.title || '',
       coverUrl: response.cover_media?.cropped_image_version?.url || '',
       items: (response.items || []).map((item) => this.mapStoryItem(item)),
@@ -339,7 +340,8 @@ export class InstagramService {
   }
 
   async getMediaComments(mediaId: string, cursor?: string): Promise<PaginatedResponse<CommentItem>> {
-    const params: Record<string, string> = { url: mediaId };
+    const mediaCode = this.extractMediaCode(mediaId);
+    const params: Record<string, string> = { url: mediaId, code: mediaCode };
     if (cursor) params['after'] = cursor;
 
     const response = await this.imaiApi.get<{
@@ -482,6 +484,27 @@ export class InstagramService {
     if (node.carousel_media && node.carousel_media.length > 0) return 'carousel';
     if (node.media_type === 2 || node.video_versions?.length) return 'video';
     return 'image';
+  }
+
+  private extractMediaCode(input: string): string {
+    const trimmed = input.trim();
+    if (!trimmed) return '';
+
+    try {
+      const parsed = new URL(trimmed);
+      const parts = parsed.pathname.split('/').filter(Boolean);
+      return parts[parts.length - 1] || trimmed;
+    } catch {
+      const sanitized = trimmed.split('?')[0].split('#')[0];
+      const parts = sanitized.split('/').filter(Boolean);
+      return parts[parts.length - 1] || sanitized;
+    }
+  }
+
+  private normalizeHighlightId(input: string): string {
+    const trimmed = input.trim();
+    if (!trimmed) return '';
+    return trimmed.startsWith('highlight:') ? trimmed.slice('highlight:'.length) : trimmed;
   }
 
   private getBestImage(node: RawMediaNode): string {
