@@ -69,38 +69,38 @@ export class InstagramService {
 
   async searchUsers(query: string): Promise<ImaiSearchResult[]> {
     try {
-      // Documented: GET /raw/ig/search/users/
+      // Documented: GET /raw/ig/search/users/ — param is "url"
       const response = await this.imaiApi.get<{
-        success: boolean;
+        status?: string;
         users?: RawSearchUser[];
-      }>('/raw/ig/search/users/', { keyword: query });
+      }>('/raw/ig/search/users/', { url: query });
 
       if (response.users && response.users.length > 0) {
         return response.users.map((user) => this.mapSearchResult(user));
       }
     } catch (err) {
-      this.logger.warn(`Raw search failed, falling back to newv1 search: ${err}`);
+      this.logger.warn(`Raw search failed, falling back to dict/users search: ${err}`);
     }
 
-    // Fallback: Documented: POST /search/newv1/
+    // Fallback: Documented: GET /dict/users/?type=search — free autocomplete endpoint
     try {
-      const response = await this.imaiApi.post<{
+      const response = await this.imaiApi.get<{
         success: boolean;
-        data?: {
-          results?: Array<{
-            user_id?: string;
-            username?: string;
-            fullname?: string;
-            picture?: string;
-            is_verified?: boolean;
-            followers?: number;
-          }>;
-        };
-      }>('/search/newv1/', {
-        keyword: query,
+        data?: Array<{
+          user_id?: string;
+          username?: string;
+          fullname?: string;
+          picture?: string;
+          is_verified?: boolean;
+          followers?: number;
+        }>;
+      }>('/dict/users/', {
+        q: query,
+        type: 'search',
+        platform: 'instagram',
       });
 
-      const results = response.data?.results || [];
+      const results = response.data || [];
       return results.map((user): ImaiSearchResult => ({
         userId: user.user_id || '',
         username: user.username || '',
@@ -110,29 +110,29 @@ export class InstagramService {
         followerCount: user.followers || 0,
       }));
     } catch (err) {
-      this.logger.error(`Search newv1 also failed: ${err}`);
+      this.logger.error(`Dict users search also failed: ${err}`);
       return [];
     }
   }
 
   async searchReels(query: string): Promise<ImaiMediaItem[]> {
-    // Documented: GET /raw/ig/search/reels/
+    // Documented: GET /raw/ig/search/reels/ — param is "url"
     const response = await this.imaiApi.get<{
-      success: boolean;
+      status?: string;
       items?: RawMediaNode[];
-    }>('/raw/ig/search/reels/', { q: query });
+    }>('/raw/ig/search/reels/', { url: query });
 
     return (response.items || []).map((item) => this.mapMediaItem(item));
   }
 
   async getProfileInfo(username: string): Promise<ImaiProfileInfo> {
-    // Documented: GET /raw/ig/user/info/
+    // Documented: GET /raw/ig/user/info/ — param is "url", response has "user" key
     const response = await this.imaiApi.get<{
-      success: boolean;
-      user_info?: RawUserInfo;
-    }>('/raw/ig/user/info/', { username });
+      status?: string;
+      user?: RawUserInfo;
+    }>('/raw/ig/user/info/', { url: username });
 
-    const user = response.user_info;
+    const user = response.user;
     if (!user) {
       throw new Error('User not found');
     }
@@ -141,35 +141,38 @@ export class InstagramService {
   }
 
   async getContactInfo(username: string): Promise<ContactInfo> {
-    // Documented: GET /exports/contacts/
+    // Documented: GET /exports/contacts/ — param is "url", response has "user_profile.contacts" array
     const response = await this.imaiApi.get<{
       success: boolean;
-      contacts?: {
-        emails?: string[];
-        phones?: string[];
-        social_links?: Array<{ platform?: string; url?: string; username?: string }>;
+      user_profile?: {
+        user_id?: string;
+        username?: string;
+        fullname?: string;
+        contacts?: Array<{ type?: string; value?: string }>;
       };
-    }>('/exports/contacts/', { username });
+    }>('/exports/contacts/', { url: username, platform: 'instagram' });
 
-    const contacts = response.contacts;
+    const contacts = response.user_profile?.contacts || [];
     return {
-      emails: contacts?.emails || [],
-      phones: contacts?.phones || [],
-      socialLinks: (contacts?.social_links || []).map((link): SocialLink => ({
-        platform: link.platform || '',
-        url: link.url || '',
-        username: link.username || '',
-      })),
+      emails: contacts.filter((c) => c.type === 'email').map((c) => c.value || ''),
+      phones: contacts.filter((c) => c.type === 'phone').map((c) => c.value || ''),
+      socialLinks: contacts
+        .filter((c) => c.type !== 'email' && c.type !== 'phone')
+        .map((c): SocialLink => ({
+          platform: c.type || '',
+          url: '',
+          username: c.value || '',
+        })),
     };
   }
 
   async getHashtagFeed(hashtag: string, cursor?: string): Promise<PaginatedResponse<ImaiMediaItem>> {
-    // Documented: GET /raw/ig/hashtag/feed/
-    const params: Record<string, string> = { tag: hashtag };
+    // Documented: GET /raw/ig/hashtag/feed/ — param is "url" for hashtag, "after" for pagination
+    const params: Record<string, string> = { url: hashtag };
     if (cursor) params['after'] = cursor;
 
     const response = await this.imaiApi.get<{
-      success: boolean;
+      status?: string;
       items?: RawMediaNode[];
       next_cursor?: string;
       has_more?: boolean;
