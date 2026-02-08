@@ -128,11 +128,15 @@ export class InstagramService {
   }
 
   async getProfileInfo(username: string): Promise<ImaiProfileInfo> {
+    if (!username) {
+      throw new Error('Username is required');
+    }
+
     // Documented: GET /raw/ig/user/info/
     const response = await this.imaiApi.get<{
       success: boolean;
       user_info?: RawUserInfo;
-    }>('/raw/ig/user/info/', { username });
+    }>('/raw/ig/user/info/', { user_id: username });
 
     const user = response.user_info;
     if (!user) {
@@ -143,6 +147,10 @@ export class InstagramService {
   }
 
   async getContactInfo(username: string): Promise<ContactInfo> {
+    if (!username) {
+      throw new Error('Username is required');
+    }
+
     // Documented: GET /exports/contacts/
     const response = await this.imaiApi.get<{
       success: boolean;
