@@ -39,6 +39,8 @@ export interface MediaItem {
   owner: {
     username: string;
     profilePicUrl: string;
+    isVerified?: boolean;
+    fullName?: string;
   };
 }
 
@@ -66,3 +68,41 @@ export interface SocialLink {
   url: string;
   username: string;
 }
+
+export interface StoryItem {
+  id: string;
+  mediaType: 'image' | 'video';
+  mediaUrl: string;
+  videoUrl: string | null;
+  timestamp: number;
+  expiringAt: number;
+}
+
+export interface HighlightInfo {
+  id: string;
+  title: string;
+  coverUrl: string;
+  mediaCount: number;
+}
+
+export interface HighlightDetail {
+  id: string;
+  title: string;
+  coverUrl: string;
+  items: StoryItem[];
+}
+
+export interface CommentItem {
+  id: string;
+  text: string;
+  timestamp: number;
+  likeCount: number;
+  replyCount: number;
+  user: {
+    username: string;
+    profilePicUrl: string;
+    isVerified: boolean;
+  };
+}
+
+export type ContentTab = 'posts' | 'reels' | 'reposts' | 'tagged';

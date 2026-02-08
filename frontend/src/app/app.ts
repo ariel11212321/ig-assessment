@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, HostListener } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 import { SearchComponent } from './features/search/search';
 import { ThemeService } from './core/services/theme.service';
@@ -19,5 +19,26 @@ export class App {
 
   toggleTheme(): void {
     this.themeService.toggle();
+  }
+
+  @HostListener('click', ['$event'])
+  onGlobalClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    if (!target) return;
+
+    // Handle clickable @mentions in captions
+    const mention = target.getAttribute('data-mention');
+    if (mention) {
+      event.preventDefault();
+      this.router.navigate(['/profile', mention]);
+      return;
+    }
+
+    // Handle clickable #hashtags in captions
+    const hashtag = target.getAttribute('data-hashtag');
+    if (hashtag) {
+      event.preventDefault();
+      this.router.navigate(['/hashtag', hashtag]);
+    }
   }
 }

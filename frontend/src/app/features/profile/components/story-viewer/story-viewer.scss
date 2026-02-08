@@ -1,0 +1,238 @@
+:host {
+  --story-bg: #1a1a1a;
+  --story-progress-bg: rgba(255, 255, 255, 0.35);
+  --story-progress-fill: #ffffff;
+  --story-header-height: 60px;
+  --story-progress-height: 2px;
+  --story-progress-gap: 4px;
+  --story-overlay-z: 1000;
+}
+
+.story-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--story-bg);
+  z-index: var(--story-overlay-z);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+// --- Progress bars ---
+.progress-bar-container {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  right: 8px;
+  display: flex;
+  gap: var(--story-progress-gap);
+  z-index: 10;
+  padding: 0 4px;
+}
+
+.progress-segment {
+  flex: 1;
+  height: var(--story-progress-height);
+  background: var(--story-progress-bg);
+  border-radius: 1px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--story-progress-fill);
+  border-radius: 1px;
+  transition: width 50ms linear;
+}
+
+// --- Header ---
+.story-header {
+  position: absolute;
+  top: 16px;
+  left: 12px;
+  right: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 10;
+  padding-top: 4px;
+}
+
+.story-user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.story-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.6);
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.story-user-text {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.story-username {
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.story-timestamp {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.story-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.header-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.85;
+  border-radius: 50%;
+  transition: opacity 0.15s ease, background-color 0.15s ease;
+
+  &:hover {
+    opacity: 1;
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+}
+
+// --- Story content ---
+.story-content {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.story-media {
+  max-width: 100%;
+  max-height: 100%;
+  width: 100%;
+  height: 100%;
+}
+
+.story-image {
+  object-fit: contain;
+}
+
+.story-video {
+  object-fit: contain;
+}
+
+// --- Tap zones for navigation ---
+.tap-zones {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  z-index: 5;
+}
+
+.tap-zone {
+  cursor: pointer;
+}
+
+.tap-zone-prev {
+  width: 30%;
+}
+
+.tap-zone-next {
+  width: 70%;
+}
+
+// --- Desktop: constrain width like Instagram ---
+@media (min-width: 736px) {
+  .story-overlay {
+    background: rgba(0, 0, 0, 0.95);
+  }
+
+  .story-content {
+    left: 50%;
+    transform: translateX(-50%);
+    width: 420px;
+    max-height: calc(100vh - 20px);
+    border-radius: 8px;
+    inset: auto;
+    top: 0;
+    bottom: 0;
+    position: absolute;
+  }
+
+  .progress-bar-container {
+    left: 50%;
+    transform: translateX(-50%);
+    width: 420px;
+    max-width: calc(100% - 16px);
+    top: 10px;
+  }
+
+  .story-header {
+    left: 50%;
+    transform: translateX(-50%);
+    width: 420px;
+    max-width: calc(100% - 24px);
+    top: 18px;
+  }
+
+  .tap-zones {
+    left: 50%;
+    transform: translateX(-50%);
+    width: 420px;
+    inset: auto;
+    top: 0;
+    bottom: 0;
+    position: absolute;
+  }
+}
+
+// --- Mobile: truly full-screen ---
+@media (max-width: 735px) {
+  .story-overlay {
+    background: var(--story-bg);
+  }
+
+  .story-content {
+    border-radius: 0;
+  }
+
+  .progress-bar-container {
+    top: 6px;
+    left: 6px;
+    right: 6px;
+  }
+
+  .story-header {
+    top: 12px;
+    left: 8px;
+    right: 8px;
+  }
+}

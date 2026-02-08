@@ -18,18 +18,54 @@
       gap: 16px;
     }
   }
+}
 
-  .profile-skeleton-highlights {
-    display: flex;
-    gap: 16px;
-    padding: 10px 0 20px;
+// Tab Navigation
+.tab-bar {
+  display: flex;
+  justify-content: center;
+  border-top: 1px solid var(--border-color, #dbdbdb);
+  margin-top: 4px;
+}
 
-    .highlight-skeleton {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-    }
+.tab-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 16px 20px;
+  background: none;
+  border: none;
+  border-top: 1px solid transparent;
+  margin-top: -1px;
+  cursor: pointer;
+  color: var(--text-secondary, #8e8e8e);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  transition: color 0.15s;
+  font-family: inherit;
+
+  &:hover {
+    color: var(--text-primary, #262626);
+  }
+
+  &.active {
+    color: var(--text-primary, #262626);
+    border-top-color: var(--text-primary, #262626);
+  }
+
+  svg {
+    opacity: 0.7;
+  }
+
+  &.active svg {
+    opacity: 1;
+  }
+}
+
+.tab-label {
+  @media (max-width: 735px) {
+    display: none;
   }
 }
 
@@ -42,6 +78,17 @@
     .profile-skeleton-header {
       gap: 20px;
       padding: 16px;
+    }
+  }
+
+  .tab-item {
+    flex: 1;
+    justify-content: center;
+    padding: 12px 0;
+
+    svg {
+      width: 24px;
+      height: 24px;
     }
   }
 }

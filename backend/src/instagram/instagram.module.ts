@@ -6,6 +6,7 @@ import { SearchController } from './controllers/search.controller';
 import { ProfileController } from './controllers/profile.controller';
 import { HashtagController } from './controllers/hashtag.controller';
 import { MediaProxyController } from './controllers/media-proxy.controller';
+import { ContentController } from './controllers/content.controller';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { MediaProxyController } from './controllers/media-proxy.controller';
     ProfileController,
     HashtagController,
     MediaProxyController,
+    ContentController,
   ],
   providers: [ImaiApiService, InstagramService],
   exports: [InstagramService],
