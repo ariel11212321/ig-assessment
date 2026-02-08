@@ -390,7 +390,7 @@ export class PostDetailComponent implements OnInit, OnDestroy {
   // Comments
   loadComments(): void {
     this.loadingComments.set(true);
-    this.api.getMediaComments(this.post.id).subscribe({
+    this.api.getMediaComments(this.post.shortcode || this.post.id).subscribe({
       next: (res) => {
         const enriched = res.items.map((c) => this.enrichComment(c));
         this.comments.set(enriched);
@@ -408,7 +408,7 @@ export class PostDetailComponent implements OnInit, OnDestroy {
     const cursor = this.commentsCursor();
     if (!cursor) return;
     this.loadingComments.set(true);
-    this.api.getMediaComments(this.post.id, cursor).subscribe({
+    this.api.getMediaComments(this.post.shortcode || this.post.id, cursor).subscribe({
       next: (res) => {
         const enriched = res.items.map((c) => this.enrichComment(c));
         this.comments.update((prev) => [...prev, ...enriched]);
